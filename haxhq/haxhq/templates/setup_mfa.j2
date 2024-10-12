@@ -1,0 +1,28 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+    <h3 style='margin-top: 30px;'>Enable two-factor authentication (2FA)</h3>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class='flash {{category}}'>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form class='mfa_form rounded' method='POST' action='{{ url_for('setup_mfa') }}'>
+    <h5>Set up your authenticator app</h5>
+    <p>Use an app to generate 2FA codes when prompted during authentication</p>
+    <h5>Scan the QR code</h5>
+    <p>Using the authenticator app scan the code below. If you cannot scan, you can manually enter this secret: {{ secret }}</p>
+    <img id='qr_code' width=180 height=180 src="{{ url_for('qrcode') }}"/>
+    <h5>Verify the code from your app</h5>
+    {% for field in form %}
+        {{ field }}
+    {% endfor %}
+    {% if subtitle in need_header %}
+    <a href='{{ url_for('usersettings') }}' style='float: right; margin: 20px 25px 0 0;'>Cancel</a>
+    {% endif %}
+    <p class='clear'></p>
+    </form>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+    {% if login_logo_src %}
+    <img id='login_logo' src='{{ login_logo_src }}' width={{ login_logo_width }} height={{ login_logo_height }} >
+    {% else %}
+    <div class='logo'></div>
+    {% endif %}
+    <form id='loginform' class='loginform' method='POST' action='{{ url_for('login') }}'>
+    <h3>Sign in to HaxHQ</h3>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class='flash {{category}}'>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    {% for field in form %}
+        {{ field }}
+    {% endfor %}
+        <a id='reset_link' href='{{ url_for('reset_pass') }}'>Password reset</a>
+    </form>
+
+    {% if demo %}
+    <div class='loginform'>
+      <h4 style='display: flex; width: 80%; margin: auto; justify-content: center; flex-wrap: wrap; gap: 0.5em;'>
+        <p class='flexrow'>Need an account?</p>
+	<a class='flexrow' href='https://haxhq.com/pentest-report-automation'>Sign up here.</a>
+      </h4>
+      <p style='width: 90%; text-align: center; font-size: 9pt; margin: 20px auto 0;'>This fully featured instance of HaxHQ is not intended for production use and comes with no guarantees.</p>
+    </div>
+    <div class='terms'>
+      <a href='https://haxhq.com/terms' target='_blank'>Terms</a>
+      <a href='https://haxhq.com/privacy' target='_blank'>Privacy</a>
+      <a href='https://haxhq.com/security' target='_blank'>Security</a>
+      <a href='https://Haxhq.com/#contact-slide' target='_blank'>Contact HaxHQ</a>
+    </div>
+    {% endif %}
+{% endblock %}

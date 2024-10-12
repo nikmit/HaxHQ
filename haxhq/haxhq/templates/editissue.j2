@@ -1,0 +1,96 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+
+<div id='home_view' class='view'>
+  {% if active_engagement %}
+  <h1>{{ active_engagement.org_name }}</h1>
+  <div>
+    <a href='{{ url_for('reporting', iid='all') }}' style='display: block; margin-bottom: 20px;' >Back to list</a>
+    {% if vuln %}
+    {# single vuln details #}
+    <h3 id='vuln_title'>{{ vuln.title }}</h3>
+      {% if vuln.name != vuln.title %}
+    <p class='center'>Shown in report as: <b>{{ vuln.name }}</b></p>
+      {% endif %}
+    <div id='affected_wrapper'>
+      <div id='vuln_affected' class='{% if vuln.exposure == 'external' %}external{% else %}internal{% endif %}'>
+        <div id='affected-hosts-grid'>
+      {% for host in affected %}
+        {% for field in host if field not in ['sid', 'hid'] %}
+          <div class='affected_host' style='grid-column: {{ loop.index }};' >
+          {% if field == 'ip' %}
+            <a href='{{ url_for('hacking', hid=host.hid)  }}'>{{ host[field] }}</a>
+          {% elif field not in ['hid', 'sid'] %}
+            {{ host[field] }}
+          {% endif %}
+          </div>
+        {% endfor %}
+          <div style='grid-column: 5; text-align: right;'>
+            {% if eng_type != 'audit' and affected|length > 1 %}
+            <a class='affected_host delete' href='{{ url_for('del_issue_host', issue_id=vuln.id, sid=host.sid) }}'>delete</a>
+        {% endif %}
+          </div>
+      {% endfor %}
+        </div>
+        <div id='addissuehost_tr' class='hidden'>
+          <form id='addhostform' method=POST action={{url_for('add_host', iid=vuln.id)}}>
+      {% for field in hform %}
+        {% if field.label.text not in hidden_fields %}
+          {{ field }}
+        {% endif %}
+      {% endfor %}
+      {{ form.csrf_token }}
+          </form>
+        </div>
+    </div>
+      {% if eng_type != 'audit' %}
+    <a style='display: block' href='#' id='show_addhost'>Add host</a>
+      {% endif %}
+    </div>
+      {% if libentry_exists %}
+    <div class='edit_issue' style='margin-bottom: 0'>
+      <p></p>
+      <div id='load_lib'>
+        {% if libentry_exists != 'match' %}
+          <a href='{{ url_for('library', libsearchstr=vuln.title, libsearchtype=libentry_exists, repiid=vuln.id) }}'>View in library</a><span class='red'>&nbsp;({{ libentry_exists }})</span>
+        {% else %}
+          <a href='{{ url_for('library', libsearchstr=vuln.title, libsearchtype=vuln.exposure, repiid=vuln.id) }}'>View in library</a>
+        {% endif %}
+      </div>
+    </div>
+      {% else %}
+    <p style='margin-top: 30px;'></p>
+      {% endif %}
+    <form id='issueeditor' method='POST' action = '{% if vuln %}{{url_for('reporting', iid=vuln.id)}}{% else %}{{url_for('add_issue')}}{% endif %}'>
+      {% include 'edit-issue-form.j2' %}
+      <div id='actions'>
+        <button type='button' id='delRep' class='button red_btn'>Delete</button>
+      {% if vuln and vuln.mergeables %}
+            <button type='button' id='getMerge' class='button blue_btn'>Get Merge Candidates</button>
+      {% endif %}
+        <button type='button' id='saveLib' class='button blue_btn'>Save to Library</button>
+        <button type='button' id='saveRep' class='button blue_btn'>Save to Report</button>
+        <button type='button' id='saveRepLib' class='button green_btn'>Save to Library & Report</button>
+      </div>
+    {% else %}
+      <h3>Vulnerability not found</h3>
+    {% endif %}
+    </form>
+  </div>
+    {% if xtra_info %}
+  <fieldset class='labelled_box'>
+    <legend>Additional information</legend>
+      {% for x in xtra_info %}
+        <p>{{ x }}</p>
+      {% endfor %}
+  </fieldset>
+    {% endif %}
+  {% else %}
+  <h1>No active engagement!</h1>
+  <h3><a href='{{ url_for('engagement') }}'>Please define/activate an engagement</a></h3>
+  {% endif %}
+  {% include 'suggestion_popup.j2' %}
+</div>
+{% endblock body %}
+

@@ -1,0 +1,163 @@
+:root               { --header-bg-color: #011627;
+                      --headers-color: #7cbacf;
+                      --header-color: #369fc3;
+                      --card-bg-color: #e8eef3;
+                      --hover-bg-red: #bc3b3b;
+                      --white-text: white;
+                      --internal-bg-color: #d1edd1;
+                      --external-bg-color: #fbe5ad;
+                      --crit-bg-color: #91243e;
+                      --high-bg-color: #dd4b50;
+                      --medium-bg-color: #f18c43;
+                      --low-bg-color: #f8c851;
+                      --info-bg-color: #67ace1;
+                    }
+
+h1                  { color: var(--header-bg-color); opacity: 0.8; }
+h3                  { color: var(--header-bg-color); opacity: 0.8; }
+h4                  { color: var(--header-bg-color); }
+h5                  { color: var(--header-bg-color); }
+input, textarea     { border-color: lightgrey; }
+p, span, td, th, a,
+select, input,
+textarea            { opacity: 0.9; }
+
+.terms a:visited, h4 a:visited,
+#loginform a:visited { color: blue; }
+
+#page               { background: white; }
+.logo               { width: 160px; height: 65px; margin: 0 auto; background-image: url('/static/img/logo_white.png'); }
+#header             { background-color: var(--header-bg-color); }
+#menu-overlay       { background-color: var(--header-bg-color); }
+#footer             { background-color: var(--header-bg-color); }
+.dropdown           { background-color: var(--header-bg-color); }
+#burgerimg          { opacity: 0.8; }
+#crossimg           { opacity: 0.8; }
+#usermenuimg        { filter: brightness(90%); }
+.dropdown li a:link,
+.dropdown li a:visited,
+.dropdown li a      { color: white; opacity: 0.8; }
+.dropdown li a:hover{ opacity: 1; }
+
+#user-menu          { color: var(--header-color); }
+.fromdropdown li a  { color: var(--header-color); opacity: 0.5; }
+.fromdropdown li a:hover { opacity: 1; }
+
+.menulink,
+.menulink a:link,
+.menulink a:visited { color: var(--header-color); opacity: 0.7; }
+#header-menu a:hover{ color: var(--header-color); opacity: 1; }
+.headertext         { color: white; opacity: 0.8; }
+#header-menu #current
+                    { font-weight: bold; opacity: 1; }
+#gethelp, #footer a { color: white; opacity: 0.8; }
+
+.flash.info         { background-color: #b3e1b2; }
+.flash.error        { background-color: #f9d377; }
+
+.loginform          { background-color: #f6f8fa; border-color: lightgrey; }
+.mfa_form           { background-color: #f6f8fa; border-color: lightgrey; }
+
+#active_engagement  { background-color: var(--card-bg-color); }
+.eng_form           { background-color: var(--card-bg-color); }
+.eng_form label     { opacity: 0.8; }
+.eng_form select    { opacity: 0.8; }
+
+#list_engagements,
+.engagement         { background-color: #325065; }
+
+#show_eng_form      { color: white; } 
+
+.org_name           { font-weight: bold; opacity: 0.8; }
+.eng_outline        { border-top-color: darkgrey; }
+
+#list_engagements a,
+.engagement a       { color: white; opacity: 0.8; }
+
+.engagement a:visited,
+.engagement a:link  { color: white; }
+
+#list_engagements a:hover,
+.engagement a:hover { color: black; opacity: 0.9; }
+
+.eng_category       { font-weight: 500; opacity: 0.8; }
+
+.update, #libview,
+.libsearch          { background-color: var(--card-bg-color); }
+
+.libsearch input,
+.libsearch select   { border-color: lightgrey; }
+.libtitle:hover     { background-color: var(--card-bg-color); }
+.libentry           { color: blue; }
+.current_text       { color: black; }
+.current_text:hover { color: black; }
+
+#scantype           { background-color: #fbe5ad; }
+.internal           { background-color: #d1edd1; }
+.external           { background-color: #fbe5ad; }
+
+.reporting_table th,
+#hoststable th      { background-color: #042036; color: white; opacity: 0.9; }
+
+#load_lib, .libpending, #load_lib a:link, .libpending a:link, .load_lib a:visited, .libpending a:visited
+                    { color: blue; }
+.libpending.current_text { color: black; }
+
+#hoststable td      { border-top-color: lightgrey; }
+.first_row td       { border-top-color: #262626 !important; }
+.hover:hover        { background-color: var(--card-bg-color); }
+
+.linkmenu           { color: #d0dcee; background-color: #0d6efd; }
+.linkmenu:hover     { color: white; }
+
+#issue_hosts_wrapper{ background-color: #eae9e9; }
+#addhost            { background-color: green; color: white; opacity: 0.8; }
+
+.labelled_box       { border-color: grey; }
+
+.wide-card,
+#usersettings       { background-color: var(--card-bg-color); }
+
+#libsearchtype,
+.template-item      { background-color: white; }
+
+.overlay            { background-color: var(--header-bg-color); opacity: 0.9; }
+
+.import-file-name,
+.import-status      { color: var(--header-bg-color); }
+
+.upload-bar         { background-color: lightgrey; }
+.upload-percent     { background-color: #4cb04f; }
+
+.warning            { background-color: #fff9c4; }
+
+.cefail             { background-color: red; }
+.ceunknown          { background-color: yellow; }
+
+.button             { border-color: grey; }
+a:hover.green_btn   { color: white; }
+.cvssjs input,
+.green_btn          { background-color: green; color: white; opacity: 0.8; }
+.blue_btn           { background-color: #2e7be9; color: white; }
+.red_btn            { background-color: #ff6868; color: white; }
+.error              { background: #f0d6d6; }
+.good               { background: #c8e6c9; }
+.green              { color: green; }
+.red                { color: red; }
+.soft               { opacity: 0.9; }
+.softer             { opacity: 0.8; }
+
+.Crit               { background-color: #91243e; color: white; opacity: 1; }
+.High               { background-color: #dd4b50; opacity: 1; }
+.Medium             { background-color: #f18c43; opacity: 1; }
+.Low                { background-color: #f8c851; opacity: 1; }
+.Info               { background-color: #67ace1; opacity: 1; }
+
+.valid              { border-color: green !important; }
+.invalid            { border-color: red !important; }
+.reqd               { border-left-color: red !important; }
+
+#timeoutwarn        { background-color: white; }
+
+.popup              { background-color: white; }
+

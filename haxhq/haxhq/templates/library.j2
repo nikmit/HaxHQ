@@ -1,0 +1,42 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+  <div id='library'>
+    <div id='issuelist'>
+      <form id='libsearch' class='libsearch' method='GET' action="{{ url_for('library') }}">
+        {% for field in searchform %}
+          {{ field }}
+        {% endfor %}
+        <input type="submit" value="Search" class='button green_btn'>
+      </form>
+      <div id='libresults'>
+        {% for entry in data %}
+          <p class='libtitle'>
+          {% if entry.exposure in ['internal', 'adreview'] %}
+            <span style='pointer-events: none' class='internal-small'>[{{ entry.exposure[0] }}]</span>
+          {% else %}
+            <span style='pointer-events: none' class='external-small'>[e]</span>
+          {% endif %}
+            &nbsp;<span style='pointer-events: none'>{{ entry.title }}</span></p>
+        {% endfor %}
+      </div>
+    </div>
+    <div id='libview'>
+      <h4 id='formtitle' style='margin-top: 10px;'> </h4>
+      <div id='altlib' class='altlib' style='float: right;'></div>
+      <form id='libeditor' class='clear' method='POST' action = "{{ url_for('library') }}">
+          <input type='hidden' id='title' name='title'>
+      {% include 'edit-issue-form.j2' %}
+          <div id='actions'>
+            <button type='submit' id='delLib' class='button red_btn hidden'>Delete</button>
+            {% if repiid %}
+            <input type='hidden' id='repiid' name='repiid' value='{{ repiid }}'>
+            <button type='submit' id='saveRepLib' class='button green_btn'>Save and load to report</button>
+            {% endif %}
+            <button type='submit' id='saveLib' class='button green_btn'>Save</button>
+          </div>
+      </form>
+    </div>
+  </div>
+{% endblock %}
+  

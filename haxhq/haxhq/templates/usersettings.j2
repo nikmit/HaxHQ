@@ -1,0 +1,96 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+<h1 id='page-title' style='margin-top: 30px;'>User settings</h1>
+<div id='usersettings' class='rounded'>
+  <div class='usersetting'>
+    <span>Nickname: </span>
+    <form method=POST action={{url_for('usersettings')}}>
+    {% for field in nickform %}
+        {{ field }}
+    {% endfor %}
+    </form>
+  </div>
+  <div class='usersetting'>
+    <span>{% if tokenverified %} Set password: {% else %} Update password: {% endif %}</span>
+    <form method=POST action={{url_for('usersettings')}}>
+      <div class='row-to-col'>
+  {% for field in passwdform %}
+    {% if field.label.text == 'Save' %}
+      </div>
+    {% endif %}
+    {{ field }}
+  {% endfor %}
+    </form>
+  </div>
+  <div class='usersetting'>
+    {% if mfa_enabled %}
+      {% if mfa_required %}
+    <p>Two factor authentication is enabled and required for all users under this subscription.</p>
+      {% else %}
+    <p>Two factor authentication enabled.</p>
+    <form class='flexedrow' method=POST action={{url_for('disable_2fa')}}>
+      {{ check_2fa_form.csrf_token }}
+      {{ check_2fa_form.otp_code }}
+      <input type='submit' class='button green_btn' value='Disable 2FA'></input>
+    </form>
+      {% endif %}
+    {% else %}
+    <div class='flexedrow' style='justify-content: space-between;'>
+      <p>Two factor authentication</p>
+      <a href='{{ url_for('enable_2fa') }}' class='button green_btn'>Enable 2FA</a>
+    </div>
+    {% endif %}
+  </div>
+  {% if certauthenabled %}
+  <div class='usersetting'>
+    {% if oldcertfp %}
+      <span>Download with new password:</span>
+    {% elif certfp %}
+      <span>New certificate password:</span>
+    {% else %}
+      <span>Certificate password:</span>
+    {% endif %}
+      <form method=POST id='certpassform' action={{ url_for('get_cert') }}>
+        <div class='row-to-col'>
+            {{ certpassform.password1 }}
+            {{ certpassform.password2 }}
+            {{ certpassform.csrf_token }}
+        </div>
+    {% if oldcertfp %}
+        {{ certpassform.submit(id='getcert', value='Download') }}
+      </form>
+      {% if cert_remaining %}
+        <p style='margin-top:5px;'>You are not using your latest issued certificate. This one expires in {{ cert_remaining }} days</p>
+      {% else %}
+        <p style='margin-top:5px;'>Client certificate authentication is not currently enabled.</p>
+      {% endif %}
+    {% elif certfp %}
+        {{ certpassform.submit(id='getcert', value='Renew') }}
+      </form>
+      {% if cert_remaining %}
+      <p style='margin-top:5px;'>Your client certificate expires in {{ cert_remaining }} days</p>
+      {% else %}
+      <p style='margin-top:5px;'>Client certificate authentication is not currently enabled.</p>
+      {% endif %}
+    {% else %}
+        {{ certpassform.submit(id='getcert', value='Issue') }}
+      </form>
+    {% endif %}
+  </div>
+  {% endif %}
+  <div class='usersetting'>
+    {% if session and 'colour_mode' in session %}
+    <div class='flexedrow' style='justify-content: space-between;'>
+      <p>Colour mode:</p>
+      {% if session['colour_mode'] == 'light' %}
+      <a href='{{ url_for('colour_mode') }}' class='button green_btn'>Use dark mode</a>
+      {% else %}
+      <a href='{{ url_for('colour_mode') }}' class='button green_btn'>Use light mode</a>
+      {% endif %}
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}
+

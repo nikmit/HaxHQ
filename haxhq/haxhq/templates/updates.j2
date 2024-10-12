@@ -1,0 +1,18 @@
+<div class='update rounded'>
+  <div>
+    <p>Available {{ update_type }} updates:</p>
+    <ul style='list-style-position: inside'>
+      {% for pkg in data %}
+        <li>{{ pkg }}</li>
+      {% endfor %}
+    </ul>
+  </div>
+    <div style='display: flex; flex-direction: column; justify-content: center; align-items: flex-end; align-content: center;'>
+      {% if update_type in ['HaxHQ', 'Python'] %}
+        <button id='update_{{ update_type }}' class='button green_btn update_btn'>Update now</button>
+        <p id='{{ update_type }}_error' class='red' style='text-align: right; display: none;'></p>
+      {% else %}
+        <p>Login to the HaxHQ host to install</p>
+      {% endif %}
+    </div>
+</div>

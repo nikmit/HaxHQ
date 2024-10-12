@@ -1,0 +1,3 @@
+[tool.licensecheck]
+using = "requirements:requirements.txt"
+format = "json"

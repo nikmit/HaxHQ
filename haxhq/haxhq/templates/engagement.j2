@@ -1,0 +1,121 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+  <div id='engagements'>
+    <div id='existing_engs'>
+    {% if engagements|length %}
+      {% set flags = {'active_loaded': False, 'engs_hidden': False} %}
+      {% for engagement in engagements %}
+        {% if engagement.primary_contact %}
+          {% if flags.update({'active_loaded': True}) %}{% endif %}
+
+      <div id='active_engagement' class='rounded'>
+        <p class='flexedrow'>
+          <span class="org_name" style='white-space: normal; margin-right: 20px;'>{{ engagement.org_name }}</span>
+          <span class='soft' style='margin: auto 0'> ( end {{ engagement.eng_end }} )</span>
+        </p>
+        <p class='eng_category'>Contacts</p>
+        <div class='eng_outline'>
+          <p class='soft flexedrow'>
+            <span>{{ engagement.primary_contact.name }}</span>
+            <span>{{ engagement.primary_contact.role }}</span>
+            <span><a href='mailto:{{ engagement.primary_contact.email }}'>{{ engagement.primary_contact.email }}</a></span>
+            <span>{{ engagement.primary_contact.phone }}</span>
+          </p>
+          {% if engagement.secondary_contact %}
+          <p class='soft flexedrow'>
+            <span>{{ engagement.secondary_contact.name }}</span>
+            <span>{{ engagement.secondary_contact.role }}</span>
+            <span><a href='mailto:{{ engagement.secondary_contact.email }}'>{{ engagement.secondary_contact.email }}</a></span>
+            <span>{{ engagement.secondary_contact.phone }}</span>
+          </p>
+          {% endif %}
+        </div>
+        <p class='eng_category'>Scope</p>
+        <div class='eng_outline'>
+          {% if engagement.subnets %}
+          <p class='soft flexedrow'>
+          {% for subnet in engagement.subnets %}<span>{{ subnet }}{% if not loop.last %},{% endif %}</span>{% endfor %}
+          </p>
+          {% endif %}
+          {% if engagement.urls %}
+          <p class='soft flexedrow'>
+          {% for url in engagement.urls %}<span>{{ url }}{% if not loop.last %},{% endif %}</span>{% endfor %}
+          </p>
+          {% endif %}
+        </div>
+          {% if engagement.notes %}
+        <p>{{ notes }}</p>
+          {% endif %}
+      </div>
+        {% else %}
+          {% set addclass = '' %}
+          {% if engagements|length  > 6 %} {% set threshold = 5 %} {% else %} {% set threshold = 6 %} {% endif %}
+          {% if flags.active_loaded %}
+            {% if loop.index > threshold %}
+              {% set addclass = ' hidden' %}
+              {% if flags.update({'engs_hidden': True}) %}{% endif %}
+            {% endif %}
+          {% else %}
+            {% if loop.index > threshold - 1 %}
+              {% set addclass = ' hidden' %}
+              {% if flags.update({'engs_hidden': True}) %}{% endif %}
+            {% endif %}
+          {% endif %}
+      <div class='rounded engagement{{ addclass }}'>
+        <a class='eng_link' href='{{ url_for('activate', eid=engagement.eid) }}'>
+          <p class='flexedrow'>
+            <span class="org_name">{{ engagement.org_name }}</span>
+            <span>( {{ engagement.test_type }}, end {{ engagement.eng_end }} )</span>
+          </p>
+        </a>
+          {% if engagement.expired %}
+          <a class='eng_del confirm' href='{{ url_for('delete_engagement', eid=engagement.eid) }}'>delete</a>
+          {% endif %}
+      </div>
+        {% endif %}
+      {% endfor %}
+      {% if not flags.engs_hidden %}{% set addclass = ' hidden' %}{% endif %}
+      <div id='list_engagements' class='rounded{{ addclass }}'>
+        <a id='show_eng_list' class='eng_link' href=''>Show all engagements</a>
+      </div>
+    {% else %}
+      <h4>Please create an engagement</h4>
+    {% endif %}
+    </div>
+    <div id='create_eng'>
+      <div id='eng_form' class='eng_form'>
+        <form method='POST' action = "{{ url_for('engagement') }}">
+        {% for field in form %}
+            {% if loop.index == 10 %}
+          <a style='display: block; opacity: 0.8;' class='clear' id='show_secondary' href='#'>Add secondary contact</a>
+            {% endif %}
+          <div class='clear'>
+            {% if field.label.text in hidden_fields %}
+                {{ field.label(class='hidden') }}
+            {% elif field.label.text.startswith('Secondary') %}
+                {{ field.label(class='hidden secondary_contact') }}
+            {% else %}
+                {{ field.label }}
+            {% endif %}
+            {% if field.name in form.errors %}
+              {% set fclass = {'class': field.render_kw.class} %}
+              {% if fclass.update({'class': fclass.class + ' invalid'}) %}{% endif %}
+              {{ field(class=fclass.class) }}
+            {% else %}
+              {{ field }}
+            {% endif %}
+          </div>
+        {% endfor %}
+        </form>
+        <a id='cancel_new_eng' href=''>Cancel</a>
+      </div>
+      <div id='eng_buttons' class='eng_form rounded'>
+        <label style='margin: auto 0;'>Quick create</label>
+        <input id='mk_dummy' type='submit' class='button blue_btn' value='Create dummy engagement'/>
+        <button id='show_eng_form' class='button green_btn'>Create engagement</button>
+      </div>
+    </div>
+  </div>
+{% endblock %}
+

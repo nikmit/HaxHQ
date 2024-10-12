@@ -1,0 +1,136 @@
+{#
+active_engagement: { org_name: '', eid: '', notes: '', target_urls: [], target_subnets: [] }
+#}
+{% extends 'layout.j2' %}
+
+{% block body %}
+  {% if active_engagement %}
+  <h1>{{ active_engagement.org_name }}</h1>
+  {### FILE IMPORT ###}
+  <div id='file_import'>
+    <div id='external_scans' class='external rounded'>
+      <p class='center'>
+        External scans: {{ external_scans|length }}
+        {% if external_scans|length > 5 %}(Scroll here to view){% endif %}
+      </p>
+      {% for file in external_scans %}
+        <div class='impt_file'>
+          <span class='filename'>{{ file.filename }}</span>
+          <a class='delscan' href='{{ url_for('delete_scan', scan_id=file.scanner+'/'+file.id) }}'>del</a>
+          <p class='clear'></p>
+        </div>
+      {% endfor %}
+    </div>
+
+    <div id='internal_scans' class='internal rounded'>
+      <p class='center'>
+        Internal scans: {{ internal_scans|length }}
+        {% if internal_scans|length > 5 %}(Scroll here to view){% endif %}
+      </p>  
+      {% for file in internal_scans %}
+        <div class='impt_file'>
+          <span class='filename'>{{ file.filename }}</span>
+          <a class='delscan' href='{{ url_for('delete_scan', filename=file.filename, scan_id=file.scanner+'/'+file.id) }}'>del</a>
+          <p class='clear'></p>
+        </div>
+      {% endfor %}
+    </div>
+    <form id='xmlform' method='POST' action='{{ url_for('upload_file') }}' enctype=multipart/form-data>
+    {% for field in form %}
+          {{ field }}
+    {% endfor %}
+    </form>
+  </div>
+  {### FILTERING  ###}
+  {% set optflds = ['service', 'software', 'errors'] %}
+  {% set optfldnums = [3,4,6] %}
+  <div id='filter' class='autocomplete'>
+    <form id='filterform' method='POST' action='{{ url_for('hacking', hid='filter') }}' enctype='multipart/form-data'>
+    {% for field in filterform %}
+      {{ field }}
+    {% endfor %}
+      <input id='apply_filter' class='blue_btn' type='submit' value='Apply filter' />
+    </form>
+  </div>
+  {### HOST TABLES  ###}
+  <table class='labelled_box' id='hoststable'>
+    <tr>
+    {# MAIN VIEW #}
+    {% for col in main_colset %}
+      <th{% if col in optflds %} class='optfld' {% endif %}>
+        {% if col == 'host' %}
+          <img id='export-txt' class='jslink' src={{url_for('static', filename='img/downloads_white.svg')}}>
+        {% endif %}
+        {{ col }}
+      </th>
+    {% endfor %}
+    </tr>
+    {% if data %}
+      {% for host in data %}
+        <tr class='first_row' hid={{ host['hid'] }}>
+        {% for col in host['first_row'] %}
+        <td {% if loop.first and host.rows %}rowspan='{{ host.rows|length + 1 }}' {% endif %}
+            {% if loop.index in optfldnums %} class='optfld' {% endif %}
+        >
+          {% if loop.last %}
+            <a href='{{ url_for('hacking', hid=host['hid']) }}'>
+          {% endif %}
+          {% for el in col %}
+              {{ el }}<br>
+          {% endfor %}
+          {% if loop.last %}
+            </a>
+          {% endif %}
+          </td>
+        {% endfor %}
+        </tr>
+        {% set optfldnums = [2,3,5] %}
+        {% for row in host['rows'] %}
+        <tr class='xtra_row' hid={{ host['hid'] }}>
+          {% for col in row %}
+          <td class='highlight {% if loop.index in optfldnums %} optfld {% endif %}'>
+            {% for el in col %}
+                {{ el }}<br>
+            {% endfor %}
+          </td>
+          {% endfor %}
+        </tr>
+        {% endfor %}
+      {% endfor %}
+    {% elif view == 'filter' %}
+    <tr>
+      <td colspan='{{ main_colset|length }}'>
+        <h3 style='margin-bottom: 30px;'>No results</h3>
+      </td>
+    </tr>
+    {% else %}
+    <tr>
+      <td colspan='{{ main_colset|length }}'>
+        <h3 style='margin-bottom: 30px;'>No hosts found - please import scans or <a href='{{ url_for('add_issue') }}'>add issues manually.</a></h3>
+      </td>
+    </tr>
+    {% endif %}
+  </table>
+  {% else %}
+  <h3 style='margin-top: 30px;'><a href='{{ url_for('engagement') }}'>Please define/activate an engagement</a></h3>
+  {% endif %}
+  {# progress bar #}
+  <div id='progress-panel' class='popup'>
+    <div id='progress-panel-grid'>
+      {#
+      <p class='import-file-name'>Scan_Report_hudd_ithc_sc5nm_20221216.xml</p>
+      <p class='upload-bar'>
+        <span class='upload-percent'></span>
+        <span class='import-status'>uploading</span>
+      </p>
+      <p class='import-file-name'>Printers_w9oczu.nessus</p>
+      <p class='upload-bar'>
+        <span class='upload-percent'></span>
+        <span class='import-status'>uploading</span>
+      </p>
+      #}
+    </div>
+    <a href='{{ url_for('hacking', hid='main') }}'>Cancel</a>
+  </div>
+{% endblock %}
+

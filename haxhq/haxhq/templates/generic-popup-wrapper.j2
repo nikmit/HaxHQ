@@ -1,0 +1,13 @@
+<div id="generic-popup" class="popup">
+    <div class="popup-body">
+        <div id='help_content' class="popup-content">
+            {% if popup_title and popup_content %}
+            <p class='popup_title'>{{ popup_title }}</p>
+            <p>{% include popup_content %}</p>
+            {% endif %}
+        </div>
+        <span class="popup-exit">Close</span>
+    </div>
+</div>
+<div class="popup-overlay"></div>
+

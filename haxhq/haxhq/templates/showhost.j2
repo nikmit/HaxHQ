@@ -1,0 +1,94 @@
+{#
+active_engagement: { org_name: '', eid: '', notes: '', target_urls: [], target_subnets: [] }
+#}
+{% extends 'layout.j2' %}
+
+{% block body %}
+<div id='home_view' class='view'>
+  {% if active_engagement %}
+  <h1>{{ active_engagement.org_name }}</h1>
+  <a href='{{ url_for('hacking', hid='main') }}'>All hosts</a>
+    {% if host %}
+        <h3> {% if host.ipv4 %}{{ host.ipv4 }}{% else %}{{ host.ipv6 }}{% endif %} </h3>
+        <p class='center' style='margin-top: -20px;'>
+        {% if host.os %}
+        <span>{{ host.os }}</span><br>
+        {% endif %}
+
+        {% if host.hostnames %}
+        {% for hostname in host.hostnames %}
+        <span>{{ hostname }}{% if not loop.last %}, {% endif %}</span>
+        {% endfor %}
+        {% endif %}
+        </p>
+        {% for s in host.vuln_services %}
+        <div class='labelled_box'>
+        <p class='svc_label'>
+        {{ s.protocol }}/{{ s.port }} ({% if s.webappurl %}{{ s.webappurl }}{% else %}{{ s.service }}{% endif %})
+        {% if s.embedded_server %} - embedded server{% endif %}
+        {% if s.software %} - {{ s.software }}
+            {% for sw in ['drupal', 'wordpress', 'python'] %}
+            {% if s[sw] %} - {{ s[sw] }}{% endif %}
+            {% endfor %}
+            {% if s.dotnet_handlers|length %} - .NET {% endif %}
+        {% else %}
+            {% for sw in ['drupal', 'wordpress', 'python'] %}
+            {% if s[sw] %}{{ s[sw] }}{% if not loop.last %}/{% endif %}{% endif %}
+            {% endfor %}
+        {% endif %}
+        </p>
+        <div class='svc_findings'>
+        {% for f in s.findings %}
+          <p class='{{ f.severity }} vuln_label'><span>{{ f.severity }}</span></p> 
+            <a class='vuln_link' href='{{ url_for('reporting', iid=f.report_vuln_id) }}'>{{ f.title }}</a>
+        {% endfor %}
+        </div>
+        {% if s.errors|length %}
+        <p style='margin: 10px 0;'>Scanner errors:
+            {% for error in s.errors %}
+            {{ error }}
+            {% endfor %}
+        </p>
+        {% endif %}
+        {% for param in s %}
+            {% if param not in ['protocol', 'port', 'service', 'findings', 'errors', 'software', 'drupal', 'wordpress',
+                                'python', 'embedded_server', 'webappurl'] %}
+        <p style='margin: 10px 0;'><span class='svc_data'>{{ param }}</span>: {{ s[param] }}</p>
+            {% endif %}
+        {% endfor %}
+        </div>
+        {% endfor %}
+        <div class='labelled_box'>
+        <p class='svc_label'>Services without detected issues at any severity</p>
+        {% for s in host.services %}
+        <p class='svc'>
+        {{ s.protocol }}/{{ s.port }} ({{ s.service }})
+        {% if s.embedded_server %} - embedded server{% endif %}
+        {% if s.software %} - {{ s.software }}
+            {% for sw in ['drupal', 'wordpress', 'python'] %}
+            {% if s[sw] %} - {{ s[sw] }}{% endif %}
+            {% endfor %}
+            {% if s.dotnet_handlers|length %} - .NET {% endif %}
+        {% else %}
+            {% for sw in ['drupal', 'wordpress', 'python'] %}
+            {% if s[sw] %}{{ s[sw] }}{% if not loop.last %}/{% endif %}{% endif %}
+            {% endfor %}
+        {% endif %}
+        {% if s.errors|length %}
+        <span>Scanner errors:
+            {% for error in s.errors %}
+            {{ error }}
+            {% endfor %}
+        </span>
+        {% endif %}
+        </p>
+        {% endfor %}
+        </div>
+    {% else %}
+      <h3>Host not found</h3>
+    {% endif %}
+  {% else %}
+  <h3><a href='{{ url_for('engagement') }}'>Please define/activate an engagement</a></h3>
+  {% endif %}
+</div>
+{% endblock %}

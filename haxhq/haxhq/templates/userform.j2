@@ -1,0 +1,17 @@
+  <form id='userform' method='POST' action={{url_for('manage_users')}}>
+  {% for field in form %}
+    {% if field.name.errors %}
+      <ul class="errors">
+      {% for error in field.name.errors %}
+        <li>{{ error }}</li>
+      {% endfor %}
+      </ul>
+    {% endif %}
+    <div class='formrow'>
+    {% if field.label.text not in hidden_labels %}{{ field.label }}{% endif %}
+    {% if field.label.text == 'Save' %}<p></p>{% endif %}
+    {{ field }}
+    </div>
+  {% endfor %}
+  </form>
+

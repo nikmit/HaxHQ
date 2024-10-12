@@ -1,0 +1,21 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+    <div class='logo'></div>
+    <form id='2fa_check' class='mfa_form rounded' method='POST' action='{{ url_for('check_2fa') }}'>
+    <h3>Enter 2FA code</h3>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+        <div class='flash {{category}}'>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+    <p style='margin-bottom: 20px;'>Two-factor authentication is required for signing in.</p>
+    <p>Please generate a code with your authenticator app and enter it below.</p>
+    {% for field in form %}
+        {{ field }}
+    {% endfor %}
+    <p class='clear'></p>
+    </form>
+{% endblock %}

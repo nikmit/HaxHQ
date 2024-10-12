@@ -1,0 +1,47 @@
+{#
+data: [{title: '', severity: 1, host_count: 1, service_count: 1 }]
+total_hosts: 1
+total_services: 1
+orderby: 'order'
+#}
+
+{% extends 'layout.j2' %}
+
+{% block body %}
+<h1>Penetration testing engagement statistics</h1>
+<div class='labelled_box'>
+    <h3>Prevalence of vulnerabilities ordered by {{ ordermap_rev[orderby]|lower }}</h3>
+    <p class='center'>Data set includes {{ total_members }} organisations and {{ total_hosts }} hosts scanned in total.</p>
+    {### FILTERING ###}
+    <div id='sfilter' class='autocomplete'>
+
+    <form id='stat_filter' method='GET' action = "{{ url_for('stats') }}">
+    {% for field in form %}
+        {% if field.label.text not in hidden_fields %}
+            {{ field.label }}
+        {% endif %}
+        {{ field }}
+    {% endfor %}
+    </form>
+
+    </div>
+    <table id='vulnstats'>
+        <tr>
+    {% for h in vulnstat_cols %}
+            <th {% if not loop.first %}class='stats_narrow_data'{% endif %}>
+                {{ h }}
+            </th>
+    {% endfor %}
+        </tr>
+    {% for vuln in vulns %}
+        <tr class='hover'>
+        {% for value in vuln.values() %}
+            <td {% if not loop.first %}class='stats_narrow_data'{% endif %}>{{ value }}</td>
+        {% endfor %}
+        </tr>
+    {% endfor %}
+    </table>
+</div>
+<p id='results_legend'>Showing {{shown}} out of {{total_results}} results.{% if shown > total_results %} Please use filtering to find additional results.{% endif %}</p>
+
+{% endblock %}

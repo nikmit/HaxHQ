@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+{% set need_header = ['Engagement', 'Hacking', 'Reporting', 'Library', 'Add finding', 'Edit finding', 'Stats', 'Reports',
+                      'Merge findings', 'User settings', 'Administration', 'Enable 2FA', 'Token authenticated'] %}
+<html lang="en">
+<head>
+  <title>HaxHQ - {{ subtitle }}</title>
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='cvssjs/cvss.css') }}">
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+  {% if session and 'colour_mode' in session %}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename=session['colour_mode'] + '.css') }}">
+  {% else %}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='light.css') }}"
+        media="screen and (prefers-color-scheme: light)">
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='dark.css') }}"
+        media="screen and (prefers-color-scheme: dark)">
+  {% endif %}
+  <link rel=stylesheet type=text/css href="{{ url_for('static', filename='jquery-ui.css') }}">
+  <link rel="apple-touch-icon" sizes="180x180" href="{{ url_for('static', filename='favicon/apple-touch-icon.png') }}">
+  <link rel="icon" type="image/png" sizes="32x32" href="{{ url_for('static', filename='favicon/favicon-32x32.png') }}">
+  <link rel="icon" type="image/png" sizes="16x16" href="{{ url_for('static', filename='favicon/favicon-16x16.png') }}">
+  <link rel="manifest" href="{{ url_for('static', filename='favicon/site.webmanifest') }}">
+  <script src="{{ url_for('static', filename='jquery.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='jquery-ui.min.js') }}"></script>
+  <script src="{{ url_for('static', filename='haxhq.js') }}"></script>
+  <script src="{{ url_for('static', filename='cvssjs/cvss.js') }}"></script>
+  <meta name="viewport" content="width=device-width, height=device-height, initial-scale=1" />
+  {% if 'MATOMO_TRACKER' in config %}
+    {{ config['MATOMO_TRACKER'] }}
+  {% endif %}
+</head>
+<body>
+  <div id='page'>
+  {% if subtitle in need_header %}
+    <div id='header'>
+      <img id='logo' alt='HaxHQ Logo' src="{{ url_for('static', filename='img/logo.png') }}"/>
+      <img id='burgerimg' src="{{ url_for('static', filename='img/burger-white.png') }}" width=30 height=17 alt='Menu' />
+      <div id='menu-overlay'>
+        <img id='crossimg' src="{{ url_for('static', filename='img/cross.png') }}" width=17 height=17 alt='Close' />
+      </div>
+      <div id='header-menu'>
+        {% if user_groups %}
+          {% if 'hackers' in user_groups or 'csa' in user_groups or 'cloud' in user_groups %}
+        <a class='menulink' {% if page == 'engagement' %}id='current'{% endif %} href="{{ url_for('engagement') }}" >Engagement</a>
+        <a class='menulink' {% if page == 'hacking' %}id='current'{% endif %} href="{{ url_for('hacking', hid='main') }}" >Hacking</a>
+        <a class='menulink' {% if page == 'reporting' %}id='current'{% endif %} href="{{ url_for('reporting', iid='all') }}" >Reporting</a>
+        <a class='menulink' {% if page == 'library' %}id='current'{% endif %} href="{{ url_for('library') }}" >Library</a>
+          {% elif false %}
+        <a class='menulink' {% if page == 'stats' %}id='current'{% endif %} href="{{ url_for('stats') }}" >Stats</a>
+          {% elif false %}
+        <a class='menulink' {% if page == 'reports' %}id='current'{% endif %} href="{{ url_for('reports') }}" >Reports</a>
+          {% endif %}
+        <a class='menulink' id='usermenulink' href='#'>User menu</a>
+        {% endif %}
+      </div>
+      <div id='user-menu'>
+        <p id='greeting'>Hi {{ user }}!</p>
+        <img id='usermenuimg' src='{{url_for('static', filename='img/usermenu.png')}}'/>
+        <ul class='dropdown' style='display: none'>
+        {# TODO: add "main menu" link for escaping the user menu when overlayed #}
+        {% if has_stats %}
+          <li><a href="{{ url_for('stats')}}" >Stats</a></li>
+        {% endif %}
+        {% if isadmin %}
+          <li><a id='getupdates'>Check for updates</a></li>
+          <li><a href='{{ url_for('admin') }}'>Administration</a></li>
+        {% endif %}
+          <li><a href='{{ url_for('usersettings') }}'>User settings</a></li>
+          <li><a href="{{ url_for('logout') }}">Logout</a></li>
+        </ul>
+      </div>
+    </div>
+    {#
+    <div id='timeoutwarn'>
+      <h3>Inactivity timeout</h3>
+      <p>Your session will time out in <span id='timeleft'>60</span> seconds.</p>
+      <p>Press a key or click anywhere to remain logged in.</p>
+    </div>
+    #}
+    <div id='content'>
+    {#% if updates_pending %}
+      <div id='updates_pending'>
+      {% for update_type in updates_pending %}
+        <div class='updates'>Update {{ update_type }}</div>
+      {% endfor %}
+      </div>
+    {% endif %#}
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+      <div class='flash {{category}}'>{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+  {% else %}
+    <div id='content'>
+  {% endif %}
+
+  {% block body %}{% endblock %}
+
+    </div> {# end content #}
+  {% if subtitle in need_header %}
+    <div id='footer' >
+      <p id='gethelp'>Contact support</p>
+    </div>
+    <div class='overlay'></div>
+    <div id='contact-popup' class='popup rounded'>
+      <a href='#' class='close-popup'>Cancel</a>
+      <h1 class='popup-title'>Contact support</h1>
+      <form method='POST' action='{{ url_for('contact') }}' enctype=multipart/form-data>
+        {#<p>Please use the form below or email <a href='mailto:support@haxhq.com'>support@haxhq.com</a></p>
+        <p style='margin-top: -15px;'>Thank you!</p>#}
+        <p>How can we help?</p>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+        <textarea id='message' name='message'></textarea>
+        <div style='width: 90%; max-width: 420px; display: flex; flex-direction: row; justify-content: space-between;'>
+          <button id='getlogs' class='button blue_btn' style='width: 42%;'>Get logs</button>
+      {% if email_enabled %}
+          <input type='submit' class='button green_btn' value='Send' style='width: 42%;'/>
+      {% else %}
+          <a id='sendmail' href='mailto:support@haxhq.com?subject=Support%20Request' class='button green_btn'>Contact support</a>
+      {% endif %}
+        </div>
+      </form>
+    </div>
+    <div id='updates-popup' class='popup rounded'>
+      <a href='#' class='close-popup'>Close</a>
+      <h1 class='popup-title'>Check updates status</h1>
+      <p style='width: 90%; margin: -10px auto 20px; text-align: center;'>It is good practice to create a snapshot of your VM before upgrading Python or Debian packages.</p> 
+      <div id='updates-content'></div>
+      <p id='updates-status'></p>
+    </div>
+  {% endif %}
+  </div> {# end page #}
+</body>
+</html>

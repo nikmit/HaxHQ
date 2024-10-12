@@ -1,0 +1,127 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+<h1 id='page-title'>Administration</h1>
+<div class='wide-card'>
+  <p class='card-label'>Users</p>
+  <div>
+    <p>Edit a user to see all saved information</p>
+    <div id='userstable'>
+    {% for user in users %}
+      <div class='userrow'>
+        <div class='userdata'>
+          <span><b>{{ user['email'] }}</b></span>
+          <span>
+          {% if user['disabled'] %}Disabled
+          {% else %}
+            {% if user['admin'] %}Admin, {% endif %}{{ user['group'] }}
+          {% endif %}
+          </span>
+        </div>
+        <button uid={{ user['id'] }} class='button green_btn adminbtn edituser'>Edit</button>
+      </div>
+    {% endfor %}
+    {% if has_free_license %}
+      <button id='adduser' class='button green_btn'>Add user</button>
+    {% else %}
+      {% if email_enabled %}
+      <button id='addlicense' class='button green_btn'>Increase license limit</button>
+      {% else %}
+      <a id='addlicense' href='mailto:support@haxhq.com?subject=We have grown 🎉 and need more licenses!' class='button green_btn'>Increase license limit</a>
+      {% endif %}
+    {% endif %}
+    </div>
+  </div>
+</div>
+<div class='wide-card'>
+  <p class='card-label'>Two factor authentication</p>
+  <div class='userrow'>
+    <p>Require 2FA for all users:</p>
+  <a class='button green_btn adminbtn' href={{ url_for('set_subscriber_mfa') }}>
+  {% if mfa_required %}Disable{% else %}Enable{% endif %}
+  </a>
+  </div>
+</div>
+<div class='wide-card'>
+  <p class='card-label'>Client certificate authentication</p>
+  <div class='userrow'>
+    {% if certauthenabled %}
+      {% if cert_remaining %}
+    <p>Client certificates are required:</p>
+    <a class='button green_btn adminbtn' href={{ url_for('disable_cert_auth') }}>Disable</a>
+      {% elif certfp %}
+    <p>Require client certificates for all users:</p>
+    <a class='button green_btn adminbtn' href={{ url_for('enable_cert_auth') }}>Enable</a>
+      {% else %}
+    <div>
+      <p style='margin-bottom: 10px;'>To enable client certificate authentication, please create your certificate first from the <a href={{ url_for('usersettings') }}>user settings page</a> and install it in your browser.</p>
+      <p>Once certificate authentication is enabled, you will not be able to access this web interface without a certificate. You can always disable certificate authentication from the command line if you have access to the HaxHQ VM.</p>
+    </div>
+      {% endif %}
+  </div>
+  <p>Users without certificates:
+      {% set nocert = {'seen': False} %}
+      {% for user in users %}
+        {% if not user.disabled and not user.certfp %}
+          {% if nocert.update({'seen': True}) %} {% endif %}
+    <span class='red'> {{ user.email }} </span>
+        {% endif %}
+      {% endfor %}
+      {% if not nocert.seen %}<span class='green'>None 🎉</span>{% endif %}
+  </p>
+    {% else %}
+    <p>Certificate authentication is disabled on this host as it needs to be available to everyone. Please contact us for a demonstration.</p>
+  </div>
+    {% endif %}
+</div>
+<div class='wide-card'>
+  <p class='card-label'>Manage report templates</p>
+  <p>Customised templates: {#{ customised_templates }#}</p>
+  <form class='templaterow' method='GET' action={{url_for('get_template')}}>
+    <div class='template-prms'>
+  {% for field in gettemplateform %}
+    {% if field.label.text == 'Download' %}
+    </div>
+      {{ field }}
+    {% else %}
+      {{ field }}
+    {% endif %}
+  {% endfor %}
+  </form>
+  <form class='templaterow' method='POST' action={{url_for('set_template')}} enctype=multipart/form-data>
+    <div class='template-prms'>
+  {% for field in settemplateform %}
+    {% if field.label.text == 'Update' %}
+    </div>
+      {{ field }}
+    {% else %}
+      {{ field }}
+    {% endif %}
+  {% endfor %}
+  </form>
+</div>
+<div class='wide-card'>
+  <p class='card-label'>Login logo</p>
+  <p style='margin-bottom: 20px;' >Default image is 160x65, any size accepted and no automatic resizing is done.<br>Supported file types: jpg, jpeg, png, gif, webp</p>
+  <img src='{{ login_logo_src }}' width={{ login_logo_width }} height={{ login_logo_height }} >
+  <form class='templaterow' method='POST' action={{url_for('update_login_logo')}} enctype=multipart/form-data>
+    <div class='template-prms'>
+  {% for field in updatelogoform %}
+    {% if field.label.text == 'Update' %}
+    </div>
+      {{ field }}
+    {% else %}
+      {{ field }}
+    {% endif %}
+  {% endfor %}
+  </form>
+</div>
+<div id='adduser-popup' class='popup'>
+  <a class='close-popup'>Cancel</a>
+  <div style='margin-top: 40px;'>
+    <div class='msg'></div>
+    <div id='user-popup-content' style='margin-top: 40px;'></div>
+  </div>
+</div>
+{% endblock %}
+

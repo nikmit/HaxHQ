@@ -1,0 +1,29 @@
+{% extends 'layout.j2' %}
+
+{% block body %}
+    <div class='logo'></div>
+    <form id='loginform' class='form loginform' method='POST' action='{{ url_for('reset_pass') }}'>
+    <h3>Reset your password</h3>
+    {% if email_enabled %}
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+          {% for category, message in messages %}
+          <div class='flash {{category}}'>{{ message }}</div>
+          {% endfor %}
+        {% endif %}
+      {% endwith %}
+
+      {% for field in form %}
+          {{ field }}
+      {% endfor %}
+    {% else %}
+      <p style='width: 90%; margin: 0 auto 20px;'>This HaxHQ instance does not have an outbound SMTP server set. Passwords can only be reset from the CLI.</p>
+    {% endif %}
+        <a id='reset_link' href='{{ url_for('login') }}'>Back to login</a>
+    </form>
+    {% if demo %}
+    <div class='loginform'>
+        <h4>Need an account? <a href='https://haxhq.com/pentest-report-automation'>Sign up here.</a></h4>
+    </div>
+    {% endif %}
+{% endblock %}

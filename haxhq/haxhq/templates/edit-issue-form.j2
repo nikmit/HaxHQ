@@ -1,0 +1,78 @@
+      {% if 'rationale' in form %}
+        {# CSA findings #}
+        {% for field in form %}
+          {% if not vuln or field.label.text != 'Exposure' %}
+          <div class='edit_issue'>
+            {% if field.label.text not in hidden_fields %}
+                {{ field.label }}
+            {% endif %}
+            {{ field }}
+          </div>
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {# pentesting findings #}
+        {% for field in form %}
+          {% if field.name == 'cvss3' %}
+            {# do nothing, handled manually below #}
+          {% elif field.name == 'severity' %}
+          <div class='edit_issue'>
+            {{ field.label }}
+            <div id='sev-cvss'>
+              {{ form['cvss3'].label }}
+              {{ form['cvss3'] }}
+              <img id='cvss-calc' src={{ url_for('static', filename='img/calc-small-grey.svg') }} alt='calculator' />
+              {{ field }}
+            </div>
+          </div>
+          {% else %}
+            {# only add DIEs for High and Critical and on the library page #}
+            {% if field.name in ['discoverability', 'exploitability', 'impact'] %}
+              {% if page == 'library' or (vuln and vuln.severity > 2) %}
+                  {% if field.name in scanner_changes %}
+        <div class='edit_issue' style='margin-bottom: 0'>
+          <p></p>
+          <div class='altlib'>
+            <a class='libpending {{ field.name }} new_scanner_text current_text'>New&nbsp;scanner text</a>
+            <a class='libpending {{ field.name }} old_scanner_text' >Old&nbsp;scanner text</a>
+            <a class='libpending {{ field.name }} libtext' >Library text</a>
+          </div>
+        </div>
+                  {% endif %}
+          <div class='edit_issue'>
+                  {{ field.label }}
+                  {{ field }}
+          </div>
+              {% endif %}
+            {% else %}
+              {% if field.name == 'name' %}
+        <div class='edit_issue autocomplete'>
+              {% else %}
+                  {% if field.name in scanner_changes %}
+        <div class='edit_issue' style='margin-bottom: 0'>
+          <p></p>
+          <div class='altlib'>
+            <a class='libpending {{ field.name }} new_scanner_text current_text' href='#'>New scanner text</a>
+            <a class='libpending {{ field.name }} old_scanner_text' href='#'>Old scanner text</a>
+            <a class='libpending {{ field.name }} libtext' href='#'>Library text</a>
+          </div>
+        </div>
+                  {% endif %}
+        <div class='edit_issue'>
+              {% endif %}
+              {% if field.label.text not in hidden_fields %}
+                {{ field.label }}
+              {% endif %}
+              {{ field }}
+        </div>
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+      {% for field in scanner_changes %}
+        {# field refers to the div container here not the form #}
+        <div class='hidden {{ field }} old_scanner_text'>{{ scanner_changes[field].old_scanner_text }}</div>
+        <div class='hidden {{ field }} new_scanner_text'>{{ scanner_changes[field].new_scanner_text }}</div>
+        <div class='hidden {{ field }} libtext'>{{ scanner_changes[field].libentry }}</div>
+      {% endfor %}
+      <div id='cvss-calc-container'></div>
